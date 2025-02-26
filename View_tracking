@@ -1,0 +1,50 @@
+import re
+import time
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+import chromedriver_autoinstaller
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+chromedriver_autoinstaller.install()
+driver = webdriver.Chrome()
+
+# query = "python flask"
+# target_blog_link = "https://blog.naver.com/loyz/223391727109"
+queries = ["python selenium", "python pytorch"]
+targets = ["https://blog.naver.com/361616/223403791694", "https://blog.naver.com/hannaurora/222656593609"]
+
+for search_query, target_blog_link in zip(queries, targets): # 복수개의 검색어, 타겟 블로그를 찾을 때
+    search_link = f"https://search.naver.com/search.naver?ssc=tab.blog.all&sm=tab_jum&query={search_query}"
+    driver.get(search_link)
+    time.sleep(2)
+
+    link_selector = f'a[href^="{target_blog_link}"]'
+
+    blog_found = False
+    for _ in range(10):
+        try:
+            element = driver.find_element(By.CSS_SELECTOR, link_selector) # 링크 셀렉터의 타겟 블로그를 찾음
+            now_rank = element.get_attribute("onclick")
+            print("검색어 랭킹은 : ", re.findall(r'\d+', now_rank[38:41])) # onclick 어트리뷰트에서 "r="" 문자열
+            Blog_found = True # 찾았을때 반복문 탈출
+            break
+        except: # try에서 못찾을 경우 예외 처리
+            driver.execute_script("window.scrollBy(0, 10000);") # 스크롤하는 함수
+            time.sleep(2)
+            print("페이지 내 랭크 못찾았기 때문에 아래로 스크롤합니다.")
+
+
+
+# ★★★ 현재 엘리먼트에 어트리뷰트가 없을 때 상위 엘리먼트로 갈때 사용함 ★★★
+# while True:
+#     new_element = element.find_element(By.XPATH, "./..")
+#     now_rank = new_element.get_attribute("onclick")
+#     if now_rank != None:
+#         print("현재 랭크 찾음 : ", now_rank)
+#         break
+#     print("현재 랭크 못찾음")
+#     element = new_element
+# print("타겟 블로그의 랭크를 찾았습니다.")
+
+input()
