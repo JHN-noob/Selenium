@@ -1,0 +1,32 @@
+import time
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+import chromedriver_autoinstaller
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+chromedriver_autoinstaller.install()
+driver = webdriver.Chrome()
+
+queries = ["꿀사과", "꿀배"]
+target_codes = ["82296298552", "87731673142"]
+
+for query, target_code in zip(queries, target_codes):
+    driver.get(f"https://search.shopping.naver.com/ns/search?query={query}")
+    time.sleep(3)
+
+    for _ in range(2):
+        driver.execute_script("window.scrollBy(0, 10000);") # 스크롤하는 함수
+        time.sleep(1)
+
+    try:
+        target_selector = f"a[data-shp-contents-id='{target_code}']"
+        target_element = driver.find_element(By.CSS_SELECTOR, target_selector)
+        print("네이버 스토어 순위는 ", target_element.get_attribute('data-shp-contents-rank'))
+    except:
+        print("타겟 상품을 못 찾음.")
+
+##############################################################
+# 웹에서 스크롤을 많이 내릴 시 위에 있던 상품들을 못찾는 상황이 발생
+
+input()
